@@ -38,7 +38,7 @@ def test_prf_hand_computed():
 
 
 def test_published_numbers_are_self_consistent():
-    d = json.loads((ROOT / "results/email-triage/results-2026-10-27-lora-triage.json").read_text())
+    d = json.loads((ROOT / "results/email-triage/lora-triage.json").read_text())
     assert d["test_n"] == 150
     for name, m in d["models"].items():
         assert m["tp"] + m["fp"] + m["fn"] + m["tn"] == 150, name
@@ -69,3 +69,36 @@ def test_split_and_text():
     train, test = split_rows(r, labels)
     assert len(train) == 10 and len(test) == 10
     assert email_text(r[0]).startswith("From: Registrar Office")
+
+
+def test_bootstrap_ci_brackets_point_estimate():
+    from email_triage.metrics import bootstrap_ci
+
+    preds = [{"gold": i % 2, "pred": (i % 3 == 0) * 1, "ms": 1} for i in range(60)]
+    lo, hi = bootstrap_ci(preds)
+    assert lo <= prf(preds)["acc"] <= hi and 0 <= lo < hi <= 1
+
+
+def test_mcnemar_identical_and_lopsided():
+    from email_triage.metrics import mcnemar_p
+
+    a = [{"gold": 1, "pred": 1}] * 20
+    assert mcnemar_p(a, a) == 1.0
+    b = [{"gold": 1, "pred": 0}] * 20
+    assert mcnemar_p(a, b) < 0.001
+
+
+def test_published_results_have_baseline_and_ci():
+    d = json.loads((ROOT / "results/email-triage/lora-triage.json").read_text())
+    assert {"production-rules", "lora", "zeroshot", "tfidf"} <= set(d["models"])
+    for m in d["models"].values():
+        lo, hi = m["acc_ci"]
+        assert lo <= m["acc"] <= hi
+
+
+def test_chart_renders_svg():
+    from email_triage.chart import render
+
+    d = json.loads((ROOT / "results/email-triage/lora-triage.json").read_text())
+    svg = render(d)
+    assert svg.startswith("<svg") and "LoRA 0.5B" in svg and "TF-IDF" in svg
