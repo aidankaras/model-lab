@@ -1,0 +1,21 @@
+{
+  "experiment": "T02 \u2014 bot-wall test (completes T01)",
+  "tool": "playwright",
+  "role": "tools-eval",
+  "task": "Cloudflare-protected page (g2.com product reviews) from both arms, default settings, no challenge-solving",
+  "armA_browser_exec": {
+    "pass": false,
+    "verdict": "blocked",
+    "detail": "interstitial, title 'g2.com', body 0 chars after 12s \u2014 challenge did not resolve"
+  },
+  "armB_playwright": {
+    "pass": false,
+    "verdict": "blocked",
+    "detail": "HTTP 403, body 0 chars after 9s (worker headless chromium)"
+  },
+  "model_cost_usd": 0.0,
+  "verdict": "No winner \u2014 neither tool beats a real bot wall from these IPs with defaults. The agent-harness 'real browser' assumption did not hold here. Bot-walled targets need a different lever: scraping APIs (Apify etc.), client-side access, or challenge-solving services (added cost + ToS review). Practical split from T01 unchanged.",
+  "followups": [
+    "Optional: retry harness with longer wait to see if a managed challenge resolves interactively"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+ "levels": {
+  "high": {
+   "pass": 5,
+   "fab": 0,
+   "runs": 12,
+   "mean_out": 402
+  },
+  "low": {
+   "pass": 7,
+   "fab": 0,
+   "runs": 12,
+   "mean_out": 297
+  },
+  "medium": {
+   "pass": 5,
+   "fab": 0,
+   "runs": 12,
+   "mean_out": 320
+  }
+ },
+ "tokens_in": 426966,
+ "tokens_out": 12224,
+ "cost_usd": 0.0157,
+ "passed": 17,
+ "cost_per_pass": 0.0009
+}

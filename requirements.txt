@@ -1,0 +1,1 @@
+# Core scoring/metrics code is pure stdlib. Training extras live in requirements-train.txt.

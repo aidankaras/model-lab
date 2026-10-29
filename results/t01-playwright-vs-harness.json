@@ -1,0 +1,63 @@
+{
+  "experiment": "T01 \u2014 Playwright (raw, scripted) vs existing CDP browser harness",
+  "tool": "playwright",
+  "role": "tools-eval",
+  "license": "Apache-2.0 (Playwright) / GPL-3.0+Chromium",
+  "tasks": [
+    {
+      "id": "T1",
+      "task": "HN top-5 titles extraction",
+      "armA_browser_exec": {
+        "pass": true,
+        "wall_s": 0.9,
+        "steps": 2
+      },
+      "armB_playwright": {
+        "pass": true,
+        "wall_s": 0.9,
+        "steps": "scripted (1)"
+      },
+      "outputs_identical": true
+    },
+    {
+      "id": "T2",
+      "task": "Wikipedia search interaction",
+      "armA_browser_exec": {
+        "pass": true,
+        "wall_s": 5.4,
+        "steps": 4,
+        "retries": 2,
+        "note": "fill_input+form.submit sent empty value twice; JS value-set worked"
+      },
+      "armB_playwright": {
+        "pass": true,
+        "wall_s": 1.4,
+        "steps": "scripted (1)"
+      },
+      "outputs_identical": true
+    },
+    {
+      "id": "T3",
+      "task": "HN Algolia dynamic search results",
+      "armA_browser_exec": {
+        "pass": true,
+        "wall_s": 3.2,
+        "steps": 3
+      },
+      "armB_playwright": {
+        "pass": true,
+        "wall_s": 9.2,
+        "steps": "scripted (1)",
+        "note": "wait_for_selector slow on worker"
+      },
+      "outputs_identical": true
+    }
+  ],
+  "model_cost_usd": 0.0,
+  "notes": "Arm A = existing CDP browser harness via browser_exec; token cost = main-model turns, not separately metered. Arm B = raw Playwright 1.5x (installed pip --user on worker; chromium already present) \u2014 zero model tokens per run once the script exists. Same outputs on all three tasks. Key difference is not speed but who writes the selectors: harness = model writes selectors live (retry cost), Playwright = selectors written once, deterministic forever.",
+  "verdict": "Split by stability: fixed/repeatable jobs (clipping scrapers, daily digests) -> scripted Playwright on the worker; exploratory, login-walled or one-off jobs -> browser harness. Playwright MCP not in Hermes connector catalog; raw library gives same capability without the wrapper.",
+  "followups": [
+    "Re-run T3 with longer timeout to separate load time from tool time",
+    "Test arm B against a bot-walled page (the harness's real edge case)"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+ "kimi-low": {
+  "luna": 5,
+  "gemini": 12,
+  "v4pro": 10,
+  "majority": 10
+ },
+ "kimi-medium": {
+  "luna": 5,
+  "gemini": 11,
+  "v4pro": 10,
+  "majority": 10
+ },
+ "kimi-high": {
+  "luna": 7,
+  "gemini": 12,
+  "v4pro": 9,
+  "majority": 9
+ },
+ "deepseek-low": {
+  "luna": 4,
+  "gemini": 3,
+  "v4pro": 10,
+  "majority": 4
+ },
+ "deepseek-medium": {
+  "luna": 7,
+  "gemini": 3,
+  "v4pro": 10,
+  "majority": 7
+ },
+ "deepseek-high": {
+  "luna": 3,
+  "gemini": 5,
+  "v4pro": 9,
+  "majority": 5
+ },
+ "glm-low": {
+  "luna": 7,
+  "gemini": 7,
+  "v4pro": 9,
+  "majority": 7
+ },
+ "glm-medium": {
+  "luna": 5,
+  "gemini": 4,
+  "v4pro": 8,
+  "majority": 5
+ },
+ "glm-high": {
+  "luna": 5,
+  "gemini": 5,
+  "v4pro": 9,
+  "majority": 5
+ }
+}

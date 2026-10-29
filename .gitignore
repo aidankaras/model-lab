@@ -1,0 +1,24 @@
+# caches / bytecode
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+*.log
+# secrets
+.env
+.env.*
+*.key
+*.pem
+# private email data and raw model output: never commit
+data/
+email_triage/data/
+preds-*.json
+out/
+out-bin/
+adapter/
+*.tsv
+!tests/fixtures/*.tsv
+raw.jsonl
+*.safetensors
+RELEASE-AUDIT.md

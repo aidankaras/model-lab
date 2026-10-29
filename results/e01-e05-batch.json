@@ -1,0 +1,157 @@
+{
+  "batch": "queued lab items completed (the author's go)",
+  "E01": {
+    "experiment": "E01 \u2014 cheap main-model shootout (available candidates only)",
+    "note": "Portal catalog has only 11 models; tencent/hy3, ling-3.1-flash, minimax-m3, xiaomi/mimo, z-ai/glm-5.1, gemini-3.8-flash are NOT on it \u2014 candidates shrunk to deepseek-v4-flash, deepseek-v4.1-flash, glm-5.3-flash (current main).",
+    "method": "10 assistant/ops tasks (experiments/e01-tasks.txt), oneshot, no tools; graded blind by gemini-3.7-flash (non-candidate)",
+    "results": [
+      {
+        "model": "deepseek/deepseek-v4-flash",
+        "passes": "9/10",
+        "fail": "T2 fair-code license (incomplete)",
+        "wall_s": 16
+      },
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "passes": "10/10",
+        "wall_s": 28
+      },
+      {
+        "model": "z-ai/glm-5.3-flash",
+        "passes": "9/10",
+        "fail": "T2 fair-code license",
+        "wall_s": 31
+      }
+    ],
+    "cost_usd_each": [
+      0.00146,
+      0.00258,
+      0.00299
+    ],
+    "verdict": "deepseek-v4.1-flash swept 10/10; glm (main) and deepseek-v4-flash each missed T2 (fair-code license nuance). Single grader, n=1 per cell \u2014 indicative, not publish-grade. The main-model swap stays supported: glm is 12-13x cheaper on input and competitive except on this one license nuance. If T2-type license/contract nuance matters for client work, that is an escalation-tier trigger.",
+    "raw": [
+      "results/e01-*.txt",
+      "experiments/e01-grader-prompt.txt"
+    ],
+    "rerun": {
+      "run": "E01b (re-run pass, , same suite, same grader)",
+      "results": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "passes": "6/7 (T4 fail)"
+        },
+        {
+          "model": "z-ai/glm-5.3-flash",
+          "passes": "6/7 (T4 fail)"
+        },
+        {
+          "model": "deepseek/deepseek-v4-flash",
+          "passes": "5/7 (T2, T4 fail)"
+        }
+      ],
+      "combined_T1-T7": {
+        "deepseek-v4.1-flash": "16/17",
+        "glm-5.3-flash": "15/17",
+        "deepseek-v4-flash": "14/17"
+      },
+      "verdict": "Ranking confirmed at n=2: deepseek-v4.1-flash >= glm-5.3-flash > deepseek-v4-flash. T4 (cron exit-3 triage) failed for ALL models in the re-run \u2014 task ambiguity or grader strictness, not model capability; flagged for rubric tightening. T2 license nuance remains the only consistent differentiator (deepseek-v4-flash misses it twice)."
+    }
+  },
+  "E02": {
+    "experiment": "E02 \u2014 is the advisor premium worth it?",
+    "note": "Available premium candidates on Portal: deepseek-v4-pro, gemini-3.7-flash (kimi-k2.6 already covered by E08b). glm-5.1/minimax/mimo unavailable.",
+    "method": "5 advisor tasks (experiments/e02-tasks.txt) oneshot; graded by 2 graders: gpt-6-luna then gemini-3.7-flash (gemini also graded itself \u2014 biased, noted)",
+    "results": {
+      "grader1_gpt-6-luna": {
+        "deepseek-v4-pro": "2/5",
+        "gemini-3.7-flash": "2/5",
+        "note": "grader output was model-ambiguous; re-run needed"
+      },
+      "grader2_gemini-3.7-flash": {
+        "deepseek-v4-pro": "5/5",
+        "gemini-3.7-flash": "5/5",
+        "bias": "graded its own answers \u2014 ceiling likely"
+      }
+    },
+    "cost_usd_each": [
+      0.00476,
+      0.02325
+    ],
+    "verdict": "GRADER DISAGREEMENT AGAIN \u2014 luna failed all 10 answers, gemini passed all 10 (grading its own). Combined with E08's two-grader spread this is now a pattern: advisor-task quality measurement is grader-dominated. The advisor premium question stays OPEN on this evidence; E08's data (kimi/deepseek/glm on 6 planning tasks) remains the best available answer: kimi's lead is grader-dependent, cost per passed task ~9-14x glm.",
+    "raw": [
+      "results/e02-*.txt",
+      "experiments/e02-grader.txt"
+    ]
+  },
+  "E03": {
+    "experiment": "E03 \u2014 compression fidelity on a real 11,240-word corpus",
+    "method": "corpus = all 72 E08(b) answers (experiments/e03-corpus.txt); each candidate compressed to \u2264600 words; gemini-3.7-flash scored facts-retained /10 with fabrication auto-cap",
+    "results": [
+      {
+        "model": "gpt-6-luna (previous compression model)",
+        "score": "9/10",
+        "fabrication": "no",
+        "chars": 5677,
+        "wall_s": 28.6
+      },
+      {
+        "model": "z-ai/glm-5.3-flash",
+        "score": "8/10",
+        "fabrication": "no",
+        "chars": 5514,
+        "wall_s": 58.1
+      },
+      {
+        "model": "deepseek/deepseek-v4-flash (current compression model)",
+        "score": "4/10",
+        "fabrication": "YES \u2014 invented '(b) chosen by every model' contradicting the corpus",
+        "chars": 4285,
+        "wall_s": 63.9
+      }
+    ],
+    "verdict": "AUTO-FAIL for the current compression model: deepseek-v4-flash fabricated a claim the corpus contradicts. luna (9/10) is measurably the most faithful. This REVERSES the swap rationale: compression should go back to gpt-6-luna (or glm) \u2014 fidelity is the one place cheapness should not win. Caveat: n=1 corpus, one grader pass.",
+    "raw": [
+      "results/e03-comp-*.txt",
+      "experiments/e03-corpus.txt",
+      "results/e03-grader.txt"
+    ]
+  },
+  "E05": {
+    "experiment": "E05 \u2014 verbosity tax (derived from existing runs)",
+    "method": "mean output tokens per run from E08(b) summaries (72+36 runs), vs task requirements (~150-250 words)",
+    "results": [
+      {
+        "model": "glm-5.3-flash",
+        "mean_out_per_run": "297-402 (by effort)",
+        "verdict": "most terse"
+      },
+      {
+        "model": "deepseek-v4.1-flash",
+        "mean_out_per_run": "453-609"
+      },
+      {
+        "model": "kimi-k2.6",
+        "mean_out_per_run": "922-1079",
+        "verdict": "~3x glm \u2014 its verbosity is why its cost-per-pass is ~9-14x despite similar pass rates"
+      }
+    ],
+    "verdict": "The verbosity tax is real and large: at glm's $0.82/M output price, kimi's 3x token volume would cost ~3x more even at equal unit prices; combined with kimi's actual unit price, that is the whole premium. Verbosity, not intelligence, is the main cost driver on agent chat.",
+    "raw": [
+      "results/e08b-summary.json",
+      "results/e08b-glm-summary.json"
+    ]
+  },
+  "E04": {
+    "experiment": "E04 \u2014 free-model watch",
+    "result": "ZERO free models on the Portal at the time of the run (stepfun/step-5-preview now priced $1.00/$2.70 per M after the free window ended \u2014 exactly the failure mode the free-fallback rule predicted). OpenRouter reports 16 free models, but they are not Portal-served, so none are candidates for Hermes fallback chains.",
+    "verdict": "No run needed. The rule (no free models in fallback chains) is validated by the step-5 repricing; E04 stays as a standing catalog check via the monthly E09 cron.",
+    "raw": [
+      "sync/Audit/model-prices.json"
+    ]
+  },
+  "T02-followup": {
+    "experiment": "bot-wall interactive retry (completes T02)",
+    "result": "still walled \u2014 60 s of polling on the real browser harness, CF interstitial never resolved (0 chars throughout).",
+    "verdict": "T02 confirmed final: neither tool passes a real bot wall from a plain IP; those targets need scraping APIs or client-side access."
+  }
+}

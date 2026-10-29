@@ -1,0 +1,76 @@
+{
+  "experiment": "E08(b)",
+  "question": "Is reasoning_effort quality worth the output tokens, and is the advisor `medium` raise justified?",
+  "models": [
+    "moonshotai/kimi-k2.6 (advisor)",
+    "deepseek/deepseek-v4.1-flash (main, at the then-verified $0.036/M input)"
+  ],
+  "provider": "nous",
+  "method": "6 planning/orchestration tasks (experiments/e08b-t1..t6: plan, delegation brief w/ child cap, debug triage, cost judgment, 3-way choice, verify-before-reporting) x effort low/medium/high x 2 runs x 2 models = 72 runs, all --oneshot --ignore-rules, no tools. Graded by openai/gpt-6-luna (non-candidate), 6 batched grader calls with anonymized shuffled answers. Per-run override only, no config changes.",
+  "pass_counts_out_of_12_runs_per_level": {
+    "kimi-k2.6": {
+      "low": 5,
+      "medium": 5,
+      "high": 7
+    },
+    "deepseek-v4.1-flash": {
+      "low": 4,
+      "medium": 7,
+      "high": 3
+    },
+    "glm-5.3-flash": {
+      "low": 7,
+      "medium": 5,
+      "high": 5
+    }
+  },
+  "mean_output_tokens_per_run": {
+    "kimi-k2.6": {
+      "low": 1079,
+      "medium": 922,
+      "high": 943
+    },
+    "deepseek-v4.1-flash": {
+      "low": 464,
+      "medium": 453,
+      "high": 609
+    },
+    "glm-5.3-flash": {
+      "low": 297,
+      "medium": 320,
+      "high": 402
+    }
+  },
+  "cost": {
+    "kimi_candidate": {
+      "tokens_in": 151403,
+      "tokens_out": 35324,
+      "usd": 0.2189,
+      "passed": 17,
+      "cost_per_pass": 0.0129
+    },
+    "deepseek_candidate": {
+      "tokens_in": 265920,
+      "tokens_out": 18309,
+      "usd": 0.0214,
+      "passed": 14,
+      "cost_per_pass": 0.0015
+    },
+    "glm_candidate_added": {
+      "tokens_in": 426966,
+      "tokens_out": 12224,
+      "usd": 0.0157,
+      "passed": 17,
+      "cost_per_pass": 0.0009,
+      "fabrications": 0
+    },
+    "grader_luna": {
+      "tokens_out": 7525,
+      "usd": 0.0082
+    },
+    "total_usd_est": 0.249
+  },
+  "verdict": "No effort level buys a clear quality win on these tasks. Pass counts show no consistent low<medium<high trend for either model (deepseek peaks at medium 7/12 then drops to 3/12 at high; kimi low and medium tie at 5). Raising effort does not even save tokens: kimi at LOW is its most verbose (mean 1,079 out). Deepseek delivers a similar pass rate at ~8.6x lower cost per passed task ($0.0015 vs $0.0129). Caveats: n=2 runs/cell, single grader pass, rubric is strict (task 3 debug triage failed for every cell \u2014 likely grader strictness, not model failure), letter-parse of grader output is approximate. Treat as indicative, not publishable-grade.",
+  "recommendation": "Keep reasoning_effort low on main AND advisor. The advisor medium raise (F6) is unproven by this data \u2014 no pass-rate gain anywhere to justify it; revert or leave with no further changes. Delegation, not effort, remains the lever for 'smarter'.",
+  "raw": "results/e08b-*.jsonl (72), results/e08b-parsed.json, results/e08b-grader-t*.jsonl, results/e08b-summary.json"
+}

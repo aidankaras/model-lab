@@ -1,0 +1,46 @@
+{
+  "experiment": "E07",
+  "question": "Does prompt caching actually fire on long sessions, and what does it save on glm-5.3-flash vs deepseek-v4.1-flash?",
+  "method": "Two identical 7-turn named sessions (e07a, e07b) on z-ai/glm-5.3-flash --reasoning low, provider nous. Turn 1 loads a ~12.8k-word synthetic doc (steady prefix); turns 2-7 ask short questions against it. Per-turn tokens read from --format stream-json results. Total cost of the experiment: under $0.01.",
+  "session_a": {
+    "turns": 7,
+    "fresh_in": 84225,
+    "cache_read": 118336,
+    "out": 276,
+    "note": "turn 1 fully cold (28,379 fresh); doc re-read as cache from turn 3 on; some turns partially cached (18% prefix-refresh drift on turns 2/5)"
+  },
+  "session_b": {
+    "turns": 7,
+    "fresh_in": 2115,
+    "cache_read": 200704,
+    "out": 325,
+    "note": "warmest run: even turn 1 hit a provider-side cache (28,352) \u2014 same doc within cache TTL from session A"
+  },
+  "cost_glm_5_3_flash": {
+    "prices": {
+      "input": 0.0174,
+      "output": 0.6736,
+      "cached": 0.0112
+    },
+    "as_run_usd": {
+      "A": 0.0028,
+      "B": 0.0025
+    },
+    "no_cache_hypothetical_usd": {
+      "A": 0.0035,
+      "B": 0.0035
+    },
+    "input_cost_saved": {
+      "A": 0.21,
+      "B": 0.36
+    }
+  },
+  "cache_ratio": {
+    "glm-5.3-flash": 1.56,
+    "deepseek-v4.1-flash": 6.7,
+    "note": "cached vs fresh input price ratios (model-prices.json ). Same session shape on deepseek would save ~85% of input cost; on glm only 21-36%."
+  },
+  "verdict": "Caching WORKS on glm-5.3-flash (steady prefix re-reads as cache, prefix-refresh drift is small) but saves little money there, because its input price is already tiny (cached only 1.56x cheaper than fresh). The session-shape win on glm is not re-sending output-heavy turns, not cheap input. On deepseek pins, the same steady-prefix discipline saves ~6.7x on input \u2014 cache hygiene matters much more there.",
+  "recommendation": "No config change. For long sessions on glm: keep prefix stable and avoid re-sending big outputs; for bulk runs on deepseek pins: steady prefix layout is a real cost lever.",
+  "raw": "results/e07/a-turn*.jsonl, results/e07/b-turn*.jsonl, results/e07-parsed.json"
+}

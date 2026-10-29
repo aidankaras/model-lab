@@ -1,0 +1,24 @@
+{
+  "experiment": "E06 (reframed as F5 validation, slot-level spot check)",
+  "question": "Do the F5-repinned auxiliary slots still do the work on deepseek-v4-flash?",
+  "model": "deepseek/deepseek-v4-flash",
+  "provider": "nous",
+  "method": "one spot-check prompt (experiments/e06-f5-spotcheck.txt) exercising both slot shapes: a \u2264140-char profile one-liner + a 5-word session title",
+  "result_text": "Planning-and-build agent; manages long-horizon dev, multi-agent teams, and dual-file-set context.\\n\\nDebrief: find why cron failed",
+  "checks": {
+    "one_line_len_chars": 98,
+    "title_word_count": 5,
+    "shape_ok": true,
+    "quality_ok": "manual judgement: description is accurate and within limit; title is topical and the right length"
+  },
+  "tokens": {
+    "input": 13914,
+    "output": 130,
+    "duration_ms": 11690
+  },
+  "cost_usd_est": 0.0015,
+  "verdict": "PASS \u2014 the cheap repin produces usable descriptions and titles. Scope note: this validates the slot outputs, not full E06 (task-graph/profile-assignment scoring against the gpt-6-luna baseline); full E06 remains queued.",
+  "raw": [
+    "results/e06-f5-deepseek-flash.jsonl"
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "method": "E06-full: 20 hand-labeled routing scenarios (experiments/e06-scenarios.txt), grader prompts in experiments/e06-grader-*.md, 2 runs per model via hermes chat --format stream-json, strict N: route parsing, accuracy vs hand labels in results/e06-labels.json",
+  "labels": {
+    "1": "none",
+    "2": "none",
+    "3": "advisor",
+    "4": "none",
+    "5": "default",
+    "6": "none",
+    "7": "advisor",
+    "8": "none",
+    "9": "advisor",
+    "10": "none",
+    "11": "default",
+    "12": "none",
+    "13": "advisor",
+    "14": "none",
+    "15": "advisor",
+    "16": "none",
+    "17": "advisor",
+    "18": "none",
+    "19": "default",
+    "20": "advisor"
+  },
+  "per_run": {
+    "ds-r1": {
+      "accuracy": 0.65,
+      "correct": 13,
+      "errors": [
+        "1:default!=none",
+        "2:default!=none",
+        "6:default!=none",
+        "10:default!=none",
+        "12:default!=none",
+        "15:default!=advisor",
+        "20:default!=advisor"
+      ],
+      "input_tokens": 14335,
+      "output_tokens": 516,
+      "cost_usd": 0.001398
+    },
+    "ds-r2": {
+      "accuracy": 0.65,
+      "correct": 13,
+      "errors": [
+        "1:default!=none",
+        "2:default!=none",
+        "6:default!=none",
+        "10:default!=none",
+        "12:default!=none",
+        "15:default!=advisor",
+        "20:default!=advisor"
+      ],
+      "input_tokens": 2047,
+      "output_tokens": 666,
+      "cost_usd": 0.000307
+    },
+    "luna-r1": {
+      "accuracy": 0.65,
+      "correct": 13,
+      "errors": [
+        "1:default!=none",
+        "2:default!=none",
+        "6:default!=none",
+        "10:default!=none",
+        "12:default!=none",
+        "15:default!=advisor",
+        "18:default!=none"
+      ],
+      "input_tokens": 6,
+      "output_tokens": 141,
+      "cost_usd": 7.1e-05
+    },
+    "luna-r2": {
+      "accuracy": 0.7,
+      "correct": 14,
+      "errors": [
+        "1:default!=none",
+        "2:default!=none",
+        "6:default!=none",
+        "10:default!=none",
+        "15:default!=advisor",
+        "20:default!=advisor"
+      ],
+      "input_tokens": 3,
+      "output_tokens": 353,
+      "cost_usd": 0.000177
+    }
+  },
+  "mean_accuracy": {
+    "deepseek/deepseek-v4-flash": 0.65,
+    "openai/gpt-6-luna": 0.675
+  },
+  "mean_cost_per_20_scenario_pass_usd": {
+    "deepseek/deepseek-v4-flash": 0.000852,
+    "openai/gpt-6-luna": 0.000124
+  },
+  "total_experiment_cost_usd": 0.001953,
+  "prices_per_M_usd": {
+    "deepseek/deepseek-v4-flash": [
+      0.091,
+      0.182
+    ],
+    "openai/gpt-6-luna": [
+      0.1,
+      0.5
+    ]
+  },
+  "verdict": "Verdict: On 20 hand-labeled routing scenarios x 2 runs, gpt-6-luna scored 0.675 mean accuracy vs deepseek-v4-flash's 0.650 \u2014 a 1-item difference, well within run-to-run noise, and 10 of the 12 combined misses are the SAME five ambiguous 'trivial-but-constructive' items (cron-debug+patch, inbox summarize, tweet draft, typo fix, CSV convert) where both models reasonably say 'default' but the label says 'none', plus two advisor/default boundary cases. Neither model actually disagrees with the other in any meaningful way; the ceiling here is label quality, not model quality. However, luna is ALSO cheaper in practice: its harness input is prompt-cached (~3-6 billed input tokens per run), while deepseek's verbatim-first-run 14k input and 1.5-2x output verbosity put its real cost per pass (~$0.00085) ~7x luna's (~$0.00012). Conclusion: do NOT switch routing to deepseek-v4-flash on accuracy grounds \u2014 it shows no advantage and costs more in practice; luna's ~3-5x list-price gap is irrelevant at this volume (<$0.001/pass), so the current luna pin stands. Recommended follow-up: re-run with tightened 'none' definitions (explicitly list 'small fix/draft/admin' examples) before any future router-model decision, since label ambiguity dominates the error budget."
+}

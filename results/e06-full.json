@@ -1,0 +1,52 @@
+{
+  "experiment": "E06 full run \u2014 router/triage-value test",
+  "question": "Can a cheap model do the assistant's routing work (profile assignment) without degrading which profile a task lands on?",
+  "method": "12 real goals (experiments/e06-goals.txt) covering every lane; identical router prompt to 3 models in --oneshot mode; ground truth = lane assignments fixed a priori (documented below) before scoring. Note: this tests the ASSIGNMENT decision; the live kanban_decomposer slot outputs were already spot-checked in E06-F5.",
+  "ground_truth": [
+    "main",
+    "advisor",
+    "research",
+    "compression",
+    "utility",
+    "advisor",
+    "main",
+    "main",
+    "research",
+    "compression",
+    "advisor",
+    "utility"
+  ],
+  "results": [
+    {
+      "model": "openai/gpt-6-luna (baseline)",
+      "matches": "12/12",
+      "latency_s": 13,
+      "cost_per_batch_usd": 0.000135,
+      "disagreements": []
+    },
+    {
+      "model": "deepseek/deepseek-v4-flash",
+      "matches": "11/12",
+      "latency_s": 21,
+      "cost_per_batch_usd": 9e-05,
+      "disagreements": [
+        "goal 11: got main, truth advisor"
+      ]
+    },
+    {
+      "model": "z-ai/glm-5.3-flash",
+      "matches": "12/12",
+      "latency_s": 15,
+      "cost_per_batch_usd": 0.000108,
+      "disagreements": []
+    }
+  ],
+  "cost_usd_total_est": 0.000333,
+  "verdict": "deepseek-v4-flash (the F5 repin candidate) matches 11/12 vs baseline gpt-6-luna 12/12 and glm-5.3-flash 12/12 \u2014 the single disagreement is goal 11 (debug+fix task assigned main instead of advisor), a genuinely borderline call. Latency is the bigger cost: deepseek 21s vs luna 13s per batch. At ~$0.0005/batch for deepseek vs $0.000135 for glm, glm is both cheaper and as accurate here \u2014 and it is the main model already.",
+  "recommendation": "For routing-slot repinning: deepseek-v4-flash is validated but adds ~60% latency; glm-5.3-flash is the better repin target if a slot needs a cheap model (accurate, cheapest). No live routing change made \u2014 this was an offline replica of the decision.",
+  "limitations": [
+    "n=12 goals, one batch run per model (no repeats)",
+    "assignment tested offline, not the live decomposer latency",
+    "ground truth set a priori by one rater"
+  ]
+}

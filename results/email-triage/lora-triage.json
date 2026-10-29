@@ -1,0 +1,105 @@
+{
+  "test_n": 150,
+  "ci": "95% percentile bootstrap over emails, 2000 resamples, seed 0",
+  "gold": "held-out emails hand-labeled by the author (single labeler); data not released for privacy",
+  "train": "older emails labeled by an LLM from a written rubric (never used as a grader); data not released",
+  "models": {
+    "production-rules": {
+      "acc": 0.533,
+      "precision": 1.0,
+      "recall": 0.014,
+      "f1": 0.028,
+      "tp": 1,
+      "fp": 0,
+      "fn": 70,
+      "tn": 79,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "acc_ci": [
+        0.453,
+        0.613
+      ],
+      "f1_ci": [
+        0.0,
+        0.088
+      ],
+      "latency": "n/a (regex)",
+      "cost_usd": 0
+    },
+    "lora": {
+      "base": "Qwen/Qwen2.5-0.5B",
+      "train_n": 263,
+      "train_seconds": 283,
+      "acc": 0.7,
+      "precision": 0.691,
+      "recall": 0.662,
+      "f1": 0.676,
+      "tp": 47,
+      "fp": 21,
+      "fn": 24,
+      "tn": 58,
+      "p50_ms": 92,
+      "p95_ms": 138,
+      "acc_ci": [
+        0.627,
+        0.773
+      ],
+      "f1_ci": [
+        0.576,
+        0.761
+      ],
+      "cost_usd": 0
+    },
+    "zeroshot": {
+      "base": "Qwen/Qwen2.5-1.5B-Instruct",
+      "acc": 0.447,
+      "precision": 0.458,
+      "recall": 0.915,
+      "f1": 0.61,
+      "tp": 65,
+      "fp": 77,
+      "fn": 6,
+      "tn": 2,
+      "p50_ms": 1561,
+      "p95_ms": 2076,
+      "acc_ci": [
+        0.367,
+        0.527
+      ],
+      "f1_ci": [
+        0.53,
+        0.682
+      ],
+      "cost_usd": 0
+    },
+    "tfidf": {
+      "base": "tfidf-word1-2+char3-5 + logistic-regression",
+      "train_n": 263,
+      "train_seconds": 1.45,
+      "acc": 0.68,
+      "precision": 0.658,
+      "recall": 0.676,
+      "f1": 0.667,
+      "tp": 48,
+      "fp": 25,
+      "fn": 23,
+      "tn": 54,
+      "p50_ms": 1,
+      "p95_ms": 7,
+      "acc_ci": [
+        0.6,
+        0.753
+      ],
+      "f1_ci": [
+        0.571,
+        0.748
+      ],
+      "cost_usd": 0
+    }
+  },
+  "mcnemar_p_vs_lora": {
+    "zeroshot": 0.0,
+    "tfidf": 0.7011,
+    "production-rules": 0.0031
+  }
+}

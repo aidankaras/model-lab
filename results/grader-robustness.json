@@ -1,0 +1,112 @@
+{
+ "study": "grader-robustness \u2014 same E08(b) answers, 5 graders",
+ "graders": [
+  "gpt-6-luna",
+  "gemini-3.7-flash",
+  "deepseek-v4-pro (family conflict: graded deepseek answers)",
+  "claude-sonnet-5.5",
+  "stepfun/step-5-preview"
+ ],
+ "rows": [
+  {
+   "cell": "kimi-low",
+   "luna": 5,
+   "gemini": 12,
+   "v4pro": 10,
+   "step5": "10/12",
+   "sonnet": "4/12",
+   "spread_max_min": 8
+  },
+  {
+   "cell": "kimi-medium",
+   "luna": 5,
+   "gemini": 11,
+   "v4pro": 10,
+   "step5": "12/12",
+   "sonnet": "8/12",
+   "spread_max_min": 7
+  },
+  {
+   "cell": "kimi-high",
+   "luna": 7,
+   "gemini": 12,
+   "v4pro": 9,
+   "step5": "12/12",
+   "sonnet": "6/12",
+   "spread_max_min": 6
+  },
+  {
+   "cell": "deepseek-low",
+   "luna": 4,
+   "gemini": 3,
+   "v4pro": 10,
+   "step5": "12/12",
+   "sonnet": "11/12",
+   "spread_max_min": 9
+  },
+  {
+   "cell": "deepseek-medium",
+   "luna": 7,
+   "gemini": 3,
+   "v4pro": 10,
+   "step5": "12/12",
+   "sonnet": "10/12",
+   "spread_max_min": 9
+  },
+  {
+   "cell": "deepseek-high",
+   "luna": 3,
+   "gemini": 5,
+   "v4pro": 9,
+   "step5": "11/12",
+   "sonnet": "11/12",
+   "spread_max_min": 8
+  },
+  {
+   "cell": "glm-low",
+   "luna": 7,
+   "gemini": 7,
+   "v4pro": 9,
+   "step5": null,
+   "sonnet": null,
+   "spread_max_min": 2
+  },
+  {
+   "cell": "glm-medium",
+   "luna": 5,
+   "gemini": 4,
+   "v4pro": 8,
+   "step5": null,
+   "sonnet": null,
+   "spread_max_min": 4
+  },
+  {
+   "cell": "glm-high",
+   "luna": 5,
+   "gemini": 5,
+   "v4pro": 9,
+   "step5": null,
+   "sonnet": null,
+   "spread_max_min": 4
+  }
+ ],
+ "summary_spread": {
+  "kimi": {
+   "kimi-low": 8,
+   "kimi-medium": 7,
+   "kimi-high": 6
+  },
+  "deepseek": {
+   "deepseek-low": 9,
+   "deepseek-medium": 9,
+   "deepseek-high": 8
+  },
+  "glm": {
+   "glm-low": 2,
+   "glm-medium": 4,
+   "glm-high": 4
+  }
+ },
+ "verdict": "Grader spread of 6-9 points (out of 12) on most cells \u2014 kimi-low alone got 12/12 from gemini, 10/12 from step-5, 10/12 from v4pro, 5/12 from luna, 4/12 from sonnet. With 5 graders the finding is now robust: model-quality rankings are grader-dominated. glm has the LOWEST grader spread (2-4) \u2014 it is the most grader-robust candidate, which strengthens the main-model choice independent of which grader you believe. kimi's apparent lead exists only under lenient graders (gemini/step-5/v4pro); under luna/sonnet it collapses. Caveat: v4pro graded its own family (deepseek answers) \u2014 treat its deepseek scores as biased; glm cells were only graded by 3 graders. Practice: any single-grader 'model A beats model B' claim in this lab is now downgraded to indicative; majority-of-3 across DIFFERENT families is the new bar (majority column in e08b-three-graders.json is contaminated for deepseek cells by the family conflict).",
+ "cost_usd_est": "~0.11 (sonnet ~0.08, step-5 ~0.03)"
+}

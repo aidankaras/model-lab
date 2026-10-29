@@ -1,0 +1,24 @@
+{
+ "moonshotai-kimi-k2.6": {
+  "runs": 36,
+  "tokens_in": 151403,
+  "tokens_out": 35324,
+  "cand_cost_usd": 0.2189,
+  "passed": 17,
+  "cost_per_pass": 0.0129
+ },
+ "deepseek-deepseek-v4.1-flash": {
+  "runs": 36,
+  "tokens_in": 265920,
+  "tokens_out": 18309,
+  "cand_cost_usd": 0.0214,
+  "passed": 14,
+  "cost_per_pass": 0.0015
+ },
+ "grader_openai_gpt-6-luna": {
+  "runs": 6,
+  "tokens_in_incl_cache": 44019,
+  "tokens_out": 7525,
+  "cost_usd": 0.0082
+ }
+}

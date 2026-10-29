@@ -1,0 +1,78 @@
+{
+  "experiment": "E08(a)",
+  "question": "Does the reasoning_effort knob reach the model?",
+  "model": "moonshotai/kimi-k2.6",
+  "provider": "nous",
+  "method": "identical single prompt (experiments/e08a-prompt.txt, planning/refactor task, no tools), run twice per reasoning level via `hermes chat --reasoning LEVEL -Q --format stream-json --ignore-rules --source tool`; no config changes (per-run override)",
+  "cells": [
+    {
+      "level": "low",
+      "run": 1,
+      "tokens_in": 4322,
+      "tokens_out": 472,
+      "cache_read": 7683,
+      "duration_ms": 12285
+    },
+    {
+      "level": "low",
+      "run": 2,
+      "tokens_in": 4202,
+      "tokens_out": 476,
+      "duration_ms": 21138
+    },
+    {
+      "level": "medium",
+      "run": 1,
+      "tokens_in": 4202,
+      "tokens_out": 286,
+      "cache_read": 7803,
+      "duration_ms": 10598
+    },
+    {
+      "level": "medium",
+      "run": 2,
+      "tokens_in": 4562,
+      "tokens_out": 991,
+      "duration_ms": 17125
+    },
+    {
+      "level": "high",
+      "run": 1,
+      "tokens_in": 4322,
+      "tokens_out": 953,
+      "cache_read": 7683,
+      "duration_ms": 22699
+    },
+    {
+      "level": "high",
+      "run": 2,
+      "tokens_in": 4082,
+      "tokens_out": 907,
+      "duration_ms": 15001
+    }
+  ],
+  "output_tokens_by_level": {
+    "low": [
+      472,
+      476
+    ],
+    "medium": [
+      286,
+      991
+    ],
+    "high": [
+      953,
+      907
+    ]
+  },
+  "verdict": "KNOB WORKS. Output tokens and wall time scale with effort (low ~474 out/~17s, high ~930 out/~19s). The knob is NOT ignored \u2014 the earlier suspicion came from `hermes config set agent.reasoning_effort` warning the key is unrecognized in config; the per-run `--reasoning` flag is honored end-to-end. Caveat: n=2 per cell and the task is a single sample \u2014 medium's spread (286 vs 991) shows high per-run variance; effort level is not a precise dial.",
+  "cost_usd_est": 0.07,
+  "raw": [
+    "results/e08a-kimi-low.jsonl",
+    "results/e08a-kimi-medium.jsonl",
+    "results/e08a-kimi-high.jsonl",
+    "results/e08a-kimi-low-r2.jsonl",
+    "results/e08a-kimi-medium-r2.jsonl",
+    "results/e08a-kimi-high-r2.jsonl"
+  ]
+}
