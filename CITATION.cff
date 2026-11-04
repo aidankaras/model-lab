@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Model Lab"
+abstract: "Cost-per-passed-task evaluations of small and open models, with cross-family graders and baselines."
+type: software
+authors:
+  - family-names: Karas
+    given-names: Aidan
+    affiliation: Boston University
+repository-code: "https://github.com/aidankaras/model-lab"
+license: MIT
+version: 1.0.0
+date-released: 2026-11-04
+keywords: [llm-evals, lora, fine-tuning, baselines]

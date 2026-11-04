@@ -35,7 +35,7 @@ def test_no_real_email_addresses():
 
 
 def test_no_banned_strings():
-    allowed = {"LICENSE", "README.md"}  # author name / badge URL only; checked separately
+    allowed = {"LICENSE", "README.md", "CITATION.cff"}  # author name / badge URL only; checked separately
     bad = []
     for p in files():
         t = text(p).lower()
