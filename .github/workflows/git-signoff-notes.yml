@@ -8,6 +8,16 @@ name: git-signoff notes
 on:
   push:
     branches: [ main ]
+    # Same code paths as verify-signoff: only code merges carry attestations.
+    # Without this, pushes with no attestation fail (recover tries to push a
+    # refs/notes/signoff that was never created).
+    paths:
+      - 'modellab/**'
+      - 'email_triage/**'
+      - '**.py'
+      - '!.claude/**'
+      - '!.github/**'
+      - '!.git-signoff/**'
   workflow_dispatch: {}
 
 permissions:
