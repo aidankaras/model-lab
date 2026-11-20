@@ -2,8 +2,24 @@ name: attested by humans
 
 on:
   pull_request:
+    paths:
+      # Signoff is for this repo's own code only (Aidan, 2026-11-20).
+      # Tooling, docs, data and the vendored skill merge without an interview.
+      - 'modellab/**'
+      - 'email_triage/**'
+      - '**.py'
+      - '!.claude/**'
+      - '!.github/**'
+      - '!.git-signoff/**'
   push:
     branches: [ main ]
+    paths:
+      - 'modellab/**'
+      - 'email_triage/**'
+      - '**.py'
+      - '!.claude/**'
+      - '!.github/**'
+      - '!.git-signoff/**'
 
 permissions:
   contents: read
@@ -16,4 +32,4 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # full history — attestations live in it
-      - uses: jerrylin96/git-signoff/verify@verify-v1.7
+      - uses: jerrylin96/git-signoff/verify@c8928804f9cf6eb659e54b7e686fbc4c0faa626f # verify-v1.7

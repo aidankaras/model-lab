@@ -21,6 +21,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: jerrylin96/git-signoff/recover@verify-v1.7
+      - uses: jerrylin96/git-signoff/recover@c8928804f9cf6eb659e54b7e686fbc4c0faa626f # verify-v1.7
         with:
           branch: main
