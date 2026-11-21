@@ -4,6 +4,8 @@ Pure stdlib so it runs offline.
 """
 from __future__ import annotations
 
+import re
+
 # Map a model id (or loose name) to a vendor family. Order matters: first match wins.
 _FAMILY_HINTS = (
     ("moonshot", "moonshot"), ("kimi", "moonshot"),
@@ -18,11 +20,16 @@ _FAMILY_HINTS = (
 
 
 def family(model_id: str) -> str:
-    """Vendor family of a model id, e.g. 'z-ai/glm-5.3-flash' -> 'zhipu'."""
+    """Vendor family of a model id, e.g. 'z-ai/glm-5.3-flash' -> 'zhipu'.
+
+    Unknown ids fall back to the vendor prefix ('acme/foo' -> 'acme'), or the bare id if there is none.
+    """
     m = model_id.lower()
     for hint, fam in _FAMILY_HINTS:
         if hint in m:
             return fam
+    if re.match(r"o\d", m.split("/")[-1]):  # OpenAI o-series: o1, o3-mini, o4-mini ...
+        return "openai"
     return m.split("/")[0]
 
 
