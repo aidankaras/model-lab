@@ -1,11 +1,13 @@
+# Vendored git-signoff files are kept byte-identical to upstream, so no hook rewrites them.
+exclude: ^(\.claude/skills/git-signoff/|\.git-signoff/)
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.17.6
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--fix]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
       - id: check-added-large-files

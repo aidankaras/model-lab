@@ -14,7 +14,7 @@ def main(data: str, preds_dir: str, out: str) -> dict:
     rows = load_rows(data)
     check_schema(rows)
     model_preds = {}
-    for mode in ("lora", "zeroshot", "tfidf"):
+    for mode in ("lora", "zeroshot", "zeroshot-cal", "tfidf"):
         try:
             with open(f"{preds_dir}/preds-{mode}.json") as f:
                 model_preds[mode] = json.load(f)

@@ -54,7 +54,8 @@ def test_production_rules_on_fixture():
 def test_build_results_and_cli(tmp_path):
     r = rows()
     test = [x for x in r if x["split"] == "test"]
-    preds = {"lora": {"base": "stub", "preds": [{"gold": x["gold"], "pred": x["gold"], "ms": 5} for x in test]}}
+    preds = {"lora": {"base": "stub", "preds": [{"tid": x["tid"], "gold": x["gold"], "pred": x["gold"], "ms": 5}
+                                                for x in test]}}
     res = build_results(r, preds)
     assert res["models"]["lora"]["acc"] == 1.0 and res["test_n"] == 10
     (tmp_path / "preds-lora.json").write_text(json.dumps(preds["lora"]))
@@ -77,6 +78,7 @@ def test_bootstrap_ci_brackets_point_estimate():
     preds = [{"gold": i % 2, "pred": (i % 3 == 0) * 1, "ms": 1} for i in range(60)]
     lo, hi = bootstrap_ci(preds)
     assert lo <= prf(preds)["acc"] <= hi and 0 <= lo < hi <= 1
+    assert bootstrap_ci(preds) == (lo, hi)  # seeded, so reproducible
 
 
 def test_mcnemar_identical_and_lopsided():
@@ -86,6 +88,73 @@ def test_mcnemar_identical_and_lopsided():
     assert mcnemar_p(a, a) == 1.0
     b = [{"gold": 1, "pred": 0}] * 20
     assert mcnemar_p(a, b) < 0.001
+
+
+def test_mcnemar_exact_value():
+    from email_triage.metrics import mcnemar_p
+
+    # a right / b wrong on 1 email, the reverse on 6: exact two-sided binomial p = 2 * 7/128 = 0.125
+    a = [{"gold": 1, "pred": 1}] + [{"gold": 1, "pred": 0}] * 6
+    b = [{"gold": 1, "pred": 0}] + [{"gold": 1, "pred": 1}] * 6
+    assert mcnemar_p(a, b) == 0.125
+
+
+def test_mcnemar_rejects_unpaired_lists():
+    from email_triage.metrics import mcnemar_p
+
+    with pytest.raises(ValueError):
+        mcnemar_p([{"gold": 1, "pred": 1}] * 3, [{"gold": 1, "pred": 1}] * 2)
+
+
+def test_prf_latency_nearest_rank_and_empty():
+    preds = [{"gold": 1, "pred": 1, "ms": float(i)} for i in range(1, 151)]
+    m = prf(preds)
+    assert m["p95_ms"] == 143.0  # nearest rank: ceil(0.95 * 150) = 143rd value
+    assert prf([{"gold": 0, "pred": 0, "ms": 0.44}])["p50_ms"] == 0.4
+    with pytest.raises(ValueError):
+        prf([])
+
+
+def _lora_preds(test, tids=None, gold_flip=None):
+    tids = tids or [x["tid"] for x in test]
+    by_tid = {x["tid"]: x for x in test}
+    return [{"tid": t, "gold": by_tid.get(t, test[0])["gold"] ^ (t == gold_flip), "pred": 1, "ms": 1} for t in tids]
+
+
+def test_build_results_aligns_shuffled_tids():
+    r = rows()
+    test = [x for x in r if x["split"] == "test"]
+    shuffled = [x["tid"] for x in reversed(test)]
+    res = build_results(r, {"lora": {"preds": _lora_preds(test, shuffled)},
+                            "tfidf": {"preds": _lora_preds(test)}})
+    assert res["mcnemar_p_vs_lora"]["tfidf"] == 1.0
+
+
+@pytest.mark.parametrize("case", ["missing", "unknown", "duplicate", "gold"])
+def test_build_results_rejects_bad_predictions(case):
+    r = rows()
+    test = [x for x in r if x["split"] == "test"]
+    tids = [x["tid"] for x in test]
+    preds = {
+        "missing": _lora_preds(test, tids[:-1]),
+        "unknown": _lora_preds(test, tids[:-1] + ["not-a-test-tid"]),
+        "duplicate": _lora_preds(test, tids[:-1] + tids[:1]),
+        "gold": _lora_preds(test, gold_flip=tids[3]),
+    }[case]
+    with pytest.raises(ValueError):
+        build_results(r, {"lora": {"preds": preds}})
+
+
+def test_tfidf_baseline_runs_on_fixture(tmp_path):
+    pytest.importorskip("sklearn")
+    from email_triage import baseline
+
+    out = baseline.run(str(FX / "emails_synth.jsonl"), str(FX / "train_labels_synth.tsv"), str(tmp_path))
+    assert len(out["preds"]) == 10 and out["train_n"] == 10
+    res = make_results.main(str(FX / "emails_synth.jsonl"), str(tmp_path), str(tmp_path / "o.json"))
+    m = res["models"]["tfidf"]
+    assert m["tp"] + m["fp"] + m["fn"] + m["tn"] == 10
+    assert 0.0 <= m["acc"] <= 1.0
 
 
 def test_published_results_have_baseline_and_ci():
@@ -102,3 +171,80 @@ def test_chart_renders_svg():
     d = json.loads((ROOT / "results/email-triage/lora-triage.json").read_text())
     svg = render(d)
     assert svg.startswith("<svg") and "LoRA 0.5B" in svg and "TF-IDF" in svg
+    # the committed chart is exactly what render() produces from the committed results
+    assert svg + "\n" == (ROOT / "docs/email-triage.svg").read_text()
+
+
+def test_best_threshold_maximizes_train_accuracy():
+    from email_triage.triage_binary import best_threshold
+
+    # every score is positive, so threshold 0 calls everything important; the best cut separates 2.0 from 5.0
+    scores, labels = [1.0, 2.0, 5.0, 6.0], [0, 0, 1, 1]
+    t = best_threshold(scores, labels)
+    assert 2.0 < t < 5.0
+    assert [int(s > t) for s in scores] == labels
+    assert best_threshold([-1.0, 1.0], [0, 1]) == 0.0  # ties prefer the uncalibrated threshold
+
+
+def test_label_logprob_sums_every_label_token():
+    torch = pytest.importorskip("torch")
+    from email_triage.triage_binary import label_logprob
+
+    class Uniform:  # every next token equally likely over a 4-token vocabulary
+        def __call__(self, input_ids):
+            return type("Out", (), {"logits": torch.zeros(1, input_ids.shape[1], 4)})()
+
+    lp = label_logprob(Uniform(), torch.tensor([0, 1]), [2, 3, 2])
+    assert lp == pytest.approx(3 * torch.log(torch.tensor(0.25)).item())
+
+
+def _raw(i, day, frm="Pat Example <pat@example.com>", labels=("INBOX",)):
+    return {"id": f"m{i}", "from": frm, "subject": f"s{i}", "date": f"Mon, {day} Oct 2026 09:00:00 -0400",
+            "snippet": "x", "labels": list(labels)}
+
+
+def test_prepare_converts_pull_output_to_dataset_schema(tmp_path):
+    from email_triage import prepare
+
+    raw = [_raw(1, 7), _raw(2, 5, labels=("INBOX", "Flagged")), _raw(3, 9, frm="ops@acme.com"), _raw(4, 6)]
+    rows = prepare.prepare(raw, test_n=2, prod_label="Flagged", gold={"m1": 1, "m3": 0})
+    assert [r["tid"] for r in rows] == ["m2", "m4", "m1", "m3"]  # oldest first
+    assert [r["split"] for r in rows] == ["train", "train", "test", "test"]  # newest two are test
+    assert rows[0]["prod"] == 1 and rows[1]["prod"] == 0
+    assert (rows[2]["name"], rows[2]["from"]) == ("Pat Example", "pat@example.com")
+    assert rows[3]["name"] == "ops@acme.com"
+    check_schema(rows)
+
+    src = tmp_path / "raw.jsonl"
+    src.write_text("".join(json.dumps(r) + "\n" for r in raw))
+    prepare.main([str(src), str(tmp_path / "data.jsonl"), "--test-n", "2"])
+    assert (tmp_path / "data.test-tids.txt").read_text() == "m1\nm3\n"
+    with pytest.raises(ValueError):
+        prepare.prepare(raw, test_n=2, gold={"m1": 1})
+
+
+def test_pull_list_ids_respects_limit():
+    from email_triage.pull import list_ids
+
+    class Req:
+        def __init__(self, resp):
+            self.resp = resp
+
+        def execute(self, num_retries=0):
+            return self.resp
+
+    class Messages:
+        calls = []
+
+        def list(self, userId, maxResults, pageToken, q):
+            self.calls.append(maxResults)
+            start = int(pageToken or 0)
+            return Req({"messages": [{"id": str(start + i)} for i in range(maxResults)],
+                        "nextPageToken": str(start + maxResults)})
+
+    class Svc:
+        def users(self):
+            return type("U", (), {"messages": lambda _self: Messages()})()
+
+    ids = list_ids(Svc(), 1200)
+    assert len(ids) == 1200 and Messages.calls == [500, 500, 200]

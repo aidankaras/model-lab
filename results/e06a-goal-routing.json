@@ -1,0 +1,53 @@
+{
+  "experiment": "E06a: goal-to-role routing (12 goals)",
+  "question": "Can a cheap model assign real requests to the right worker role as well as the baseline model?",
+  "setup": "12 real goals covering every worker role in the author's assistant setup; the same router prompt sent to 3 models, one-shot, one batch each. Ground truth (one role per goal) was fixed by one rater before scoring. Not the same test as E06b.",
+  "ground_truth": [
+    "main",
+    "advisor",
+    "research",
+    "compression",
+    "utility",
+    "advisor",
+    "main",
+    "main",
+    "research",
+    "compression",
+    "advisor",
+    "utility"
+  ],
+  "results": [
+    {
+      "model": "openai/gpt-6-luna (baseline)",
+      "matches": "12/12",
+      "latency_s": 13,
+      "cost_per_batch_usd": 0.000135,
+      "disagreements": []
+    },
+    {
+      "model": "deepseek/deepseek-v4-flash",
+      "matches": "11/12",
+      "latency_s": 21,
+      "cost_per_batch_usd": 9e-05,
+      "disagreements": [
+        "goal 11: got main, truth advisor"
+      ]
+    },
+    {
+      "model": "z-ai/glm-5.3-flash",
+      "matches": "12/12",
+      "latency_s": 15,
+      "cost_per_batch_usd": 0.000108,
+      "disagreements": []
+    }
+  ],
+  "cost_usd_total_est": 0.000333,
+  "finding": "gpt-6-luna and glm-5.3-flash matched all 12 assignments; deepseek-v4-flash matched 11 (goal 11, a debug-and-fix task, went to main instead of advisor, a borderline call). Per batch, deepseek-v4-flash was the cheapest ($0.00009) but the slowest (21 s vs 13 s for luna); glm-5.3-flash ($0.000108) was cheaper than luna ($0.000135) with the same accuracy.",
+  "limitations": [
+    "n=12 goals, one batch run per model (no repeats)",
+    "assignment tested offline, not the live decomposer latency",
+    "ground truth set a priori by one rater"
+  ],
+  "cost_usd_recorded": 0.000333,
+  "notes": "Models were called through an OpenAI-compatible router; names and prices are as recorded at run time."
+}

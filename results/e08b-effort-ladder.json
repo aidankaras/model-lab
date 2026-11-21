@@ -1,12 +1,12 @@
 {
-  "experiment": "E08(b)",
-  "question": "Is reasoning_effort quality worth the output tokens, and is the advisor `medium` raise justified?",
+  "experiment": "E08b: reasoning-effort ladder",
+  "question": "Does higher reasoning effort improve quality enough to pay for the extra output tokens?",
   "models": [
-    "moonshotai/kimi-k2.6 (advisor)",
-    "deepseek/deepseek-v4.1-flash (main, at the then-verified $0.036/M input)"
+    "moonshotai/kimi-k2.6",
+    "deepseek/deepseek-v4.1-flash",
+    "z-ai/glm-5.3-flash"
   ],
-  "provider": "nous",
-  "method": "6 planning/orchestration tasks (experiments/e08b-t1..t6: plan, delegation brief w/ child cap, debug triage, cost judgment, 3-way choice, verify-before-reporting) x effort low/medium/high x 2 runs x 2 models = 72 runs, all --oneshot --ignore-rules, no tools. Graded by openai/gpt-6-luna (non-candidate), 6 batched grader calls with anonymized shuffled answers. Per-run override only, no config changes.",
+  "setup": "6 planning/orchestration tasks (plan, delegation brief with a child cap, debug triage, cost judgment, 3-way choice, verify before reporting) x 3 effort levels (low, medium, high) x 2 runs x 3 models = 108 runs, one-shot, no tools. kimi and deepseek ran first (72 runs); glm was added later with the same tasks and grader (36 runs). Pass counts here are from one grader, openai/gpt-6-luna (not a candidate), in batched calls with anonymized, shuffled answers. e08b-three-graders.json re-grades the same answers with two more graders.",
   "pass_counts_out_of_12_runs_per_level": {
     "kimi-k2.6": {
       "low": 5,
@@ -56,7 +56,7 @@
       "passed": 14,
       "cost_per_pass": 0.0015
     },
-    "glm_candidate_added": {
+    "glm_candidate": {
       "tokens_in": 426966,
       "tokens_out": 12224,
       "usd": 0.0157,
@@ -68,9 +68,17 @@
       "tokens_out": 7525,
       "usd": 0.0082
     },
-    "total_usd_est": 0.249
+    "total_usd_est": 0.249,
+    "total_note": "total_usd_est covers kimi, deepseek and the luna grader; glm adds 0.0157.",
+    "passed_note": "passed and cost_per_pass use the luna-only pass counts above."
   },
-  "verdict": "No effort level buys a clear quality win on these tasks. Pass counts show no consistent low<medium<high trend for either model (deepseek peaks at medium 7/12 then drops to 3/12 at high; kimi low and medium tie at 5). Raising effort does not even save tokens: kimi at LOW is its most verbose (mean 1,079 out). Deepseek delivers a similar pass rate at ~8.6x lower cost per passed task ($0.0015 vs $0.0129). Caveats: n=2 runs/cell, single grader pass, rubric is strict (task 3 debug triage failed for every cell \u2014 likely grader strictness, not model failure), letter-parse of grader output is approximate. Treat as indicative, not publishable-grade.",
-  "recommendation": "Keep reasoning_effort low on main AND advisor. The advisor medium raise (F6) is unproven by this data \u2014 no pass-rate gain anywhere to justify it; revert or leave with no further changes. Delegation, not effort, remains the lever for 'smarter'.",
-  "raw": "results/e08b-*.jsonl (72), results/e08b-parsed.json, results/e08b-grader-t*.jsonl, results/e08b-summary.json"
+  "finding": "No effort level buys a clear quality win: pass counts show no consistent low < medium < high trend (deepseek peaks at medium 7/12 then drops to 3/12 at high; kimi low and medium tie at 5). x: kimi at low is its most verbose (mean 1,079 output tokens). Under luna alone, cost per passed task is kimi $0.0129, deepseek $0.0015, glm $0.0009. Under the majority of three graders (e08b-three-graders.json) kimi passes 29/36 ($0.0075 per pass), deepseek 16/36 ($0.0013, contaminated: one grader is deepseek-v4-pro) and glm 17/36 ($0.0009). The quality ranking depends on the grader; glm has the lowest cost per pass under both.",
+  "limitations": [
+    "n=2 runs per cell",
+    "task 3 (debug triage) failed in every cell under luna, likely grader strictness",
+    "letter-parsing of grader output is approximate",
+    "indicative, not publishable"
+  ],
+  "cost_usd_recorded": 0.2647,
+  "notes": "Models were called through an OpenAI-compatible router; names and prices are as recorded at run time."
 }

@@ -1,5 +1,6 @@
 {
-  "experiment": "T01 \u2014 Playwright (raw, scripted) vs existing CDP browser harness",
+  "experiment": "T01: scripted Playwright vs an agent-driven CDP browser harness",
+  "question": "For scripted browsing tasks, is a raw Playwright script better than a model driving a browser harness?",
   "tool": "playwright",
   "role": "tools-eval",
   "license": "Apache-2.0 (Playwright) / GPL-3.0+Chromium",
@@ -48,16 +49,17 @@
         "pass": true,
         "wall_s": 9.2,
         "steps": "scripted (1)",
-        "note": "wait_for_selector slow on worker"
+        "note": "wait_for_selector was slow on the separate machine"
       },
       "outputs_identical": true
     }
   ],
   "model_cost_usd": 0.0,
-  "notes": "Arm A = existing CDP browser harness via browser_exec; token cost = main-model turns, not separately metered. Arm B = raw Playwright 1.5x (installed pip --user on worker; chromium already present) \u2014 zero model tokens per run once the script exists. Same outputs on all three tasks. Key difference is not speed but who writes the selectors: harness = model writes selectors live (retry cost), Playwright = selectors written once, deterministic forever.",
-  "verdict": "Split by stability: fixed/repeatable jobs (clipping scrapers, daily digests) -> scripted Playwright on the worker; exploratory, login-walled or one-off jobs -> browser harness. Playwright MCP not in Hermes connector catalog; raw library gives same capability without the wrapper.",
+  "notes": "Arm A: an existing CDP browser harness driven by the default model, which writes selectors live (model turns were not metered separately). Arm B: raw Playwright 1.5x on a separate machine with Chromium, zero model tokens per run once the script exists. Outputs were identical on all three tasks. The main difference is not speed but who writes the selectors: the model each time (with retries), or a person once.",
+  "finding": "Split by stability: fixed, repeatable jobs suit a scripted Playwright job; exploratory, login-walled or one-off jobs suit the agent harness.",
   "followups": [
     "Re-run T3 with longer timeout to separate load time from tool time",
     "Test arm B against a bot-walled page (the harness's real edge case)"
-  ]
+  ],
+  "cost_usd_recorded": 0.0
 }

@@ -1,5 +1,7 @@
 {
-  "method": "E06-full: 20 hand-labeled routing scenarios (experiments/e06-scenarios.txt), grader prompts in experiments/e06-grader-*.md, 2 runs per model via hermes chat --format stream-json, strict N: route parsing, accuracy vs hand labels in results/e06-labels.json",
+  "experiment": "E06b: route decisions on 20 hand-labeled scenarios",
+  "question": "Does a cheaper model pick the right route for a request (none, default or advisor) as accurately as the baseline?",
+  "setup": "20 hand-labeled routing scenarios, 2 runs per model, strict parsing of the route from each answer, accuracy against the hand labels. Harder than E06a: the labels separate trivial requests (none) from ones that need the default model or the advisor.",
   "labels": {
     "1": "none",
     "2": "none",
@@ -105,5 +107,17 @@
       0.1,
       0.5
     ]
-  }
+  },
+  "prices_order": [
+    "input",
+    "output"
+  ],
+  "finding": "gpt-6-luna averaged 0.675 accuracy and deepseek-v4-flash 0.650, a one-item difference within run-to-run noise. Of the 27 misses across the 4 runs, 19 are on the same five items (1, 2, 6, 10, 12: cron debug and patch, inbox summary, tweet draft, typo fix, CSV conversion) where the label is 'none' and the models said 'default'; 7 are on two advisor/default boundary items (15, 20) and 1 is on item 18. The ceiling here is label quality, not model quality. luna was also cheaper in practice ($0.000124 vs $0.000852 per 20-scenario pass) because its input was prompt-cached.",
+  "limitations": [
+    "one labeler; the 'none' definition is ambiguous",
+    "2 runs per model",
+    "luna's billed input (3-6 tokens per run) reflects caching, not prompt size"
+  ],
+  "cost_usd_recorded": 0.001953,
+  "notes": "Models were called through an OpenAI-compatible router; names and prices are as recorded at run time."
 }

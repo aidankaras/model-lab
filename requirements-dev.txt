@@ -1,4 +1,9 @@
 -r requirements.txt
-pytest
-ruff
-pre-commit
+# Pinned so CI and the pre-commit hook use the same tool versions. Dependabot bumps these monthly.
+pytest==9.2.0
+ruff==0.17.6
+pre-commit==4.7.0
+# Lets the test suite run the TF-IDF baseline on the synthetic fixture (no model downloads).
+scikit-learn==1.9.1
+scipy==1.18.1; python_version >= "3.12"
+scipy==1.17.1; python_version < "3.12"

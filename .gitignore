@@ -21,4 +21,3 @@ adapter/
 !tests/fixtures/*.tsv
 raw.jsonl
 *.safetensors
-RELEASE-AUDIT.md
