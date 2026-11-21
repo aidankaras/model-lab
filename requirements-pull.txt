@@ -1,0 +1,4 @@
+-r requirements.txt
+# Only needed for email_triage/pull.py (Gmail API metadata export).
+google-api-python-client==2.202.0
+google-auth==2.63.0

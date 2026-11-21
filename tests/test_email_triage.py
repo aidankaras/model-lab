@@ -196,3 +196,55 @@ def test_label_logprob_sums_every_label_token():
 
     lp = label_logprob(Uniform(), torch.tensor([0, 1]), [2, 3, 2])
     assert lp == pytest.approx(3 * torch.log(torch.tensor(0.25)).item())
+
+
+def _raw(i, day, frm="Pat Example <pat@example.com>", labels=("INBOX",)):
+    return {"id": f"m{i}", "from": frm, "subject": f"s{i}", "date": f"Mon, {day} Oct 2026 09:00:00 -0400",
+            "snippet": "x", "labels": list(labels)}
+
+
+def test_prepare_converts_pull_output_to_dataset_schema(tmp_path):
+    from email_triage import prepare
+
+    raw = [_raw(1, 7), _raw(2, 5, labels=("INBOX", "Flagged")), _raw(3, 9, frm="ops@acme.com"), _raw(4, 6)]
+    rows = prepare.prepare(raw, test_n=2, prod_label="Flagged", gold={"m1": 1, "m3": 0})
+    assert [r["tid"] for r in rows] == ["m2", "m4", "m1", "m3"]  # oldest first
+    assert [r["split"] for r in rows] == ["train", "train", "test", "test"]  # newest two are test
+    assert rows[0]["prod"] == 1 and rows[1]["prod"] == 0
+    assert (rows[2]["name"], rows[2]["from"]) == ("Pat Example", "pat@example.com")
+    assert rows[3]["name"] == "ops@acme.com"
+    check_schema(rows)
+
+    src = tmp_path / "raw.jsonl"
+    src.write_text("".join(json.dumps(r) + "\n" for r in raw))
+    prepare.main([str(src), str(tmp_path / "data.jsonl"), "--test-n", "2"])
+    assert (tmp_path / "data.test-tids.txt").read_text() == "m1\nm3\n"
+    with pytest.raises(ValueError):
+        prepare.prepare(raw, test_n=2, gold={"m1": 1})
+
+
+def test_pull_list_ids_respects_limit():
+    from email_triage.pull import list_ids
+
+    class Req:
+        def __init__(self, resp):
+            self.resp = resp
+
+        def execute(self, num_retries=0):
+            return self.resp
+
+    class Messages:
+        calls = []
+
+        def list(self, userId, maxResults, pageToken, q):
+            self.calls.append(maxResults)
+            start = int(pageToken or 0)
+            return Req({"messages": [{"id": str(start + i)} for i in range(maxResults)],
+                        "nextPageToken": str(start + maxResults)})
+
+    class Svc:
+        def users(self):
+            return type("U", (), {"messages": lambda _self: Messages()})()
+
+    ids = list_ids(Svc(), 1200)
+    assert len(ids) == 1200 and Messages.calls == [500, 500, 200]
