@@ -1,3 +1,0 @@
-# Third-party tooling vendored from jerrylin96/git-signoff: keep it out of GitHub's language stats.
-.claude/** linguist-vendored
-.git-signoff/** linguist-vendored

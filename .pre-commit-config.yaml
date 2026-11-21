@@ -1,5 +1,3 @@
-# Vendored git-signoff files are kept byte-identical to upstream, so no hook rewrites them.
-exclude: ^(\.claude/skills/git-signoff/|\.git-signoff/)
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.6
