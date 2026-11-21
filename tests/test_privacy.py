@@ -10,9 +10,6 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 SKIP_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache"}
 SELF = Path(__file__).resolve()
-# Vendored /git-signoff skill (jerrylin96/git-signoff): third-party files kept byte-identical; its
-# author's contact details are his, not personal data from this project.
-VENDORED = (".claude", "skills", "git-signoff")
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 OK_DOMAIN = re.compile(r"(^|\.)(example\.com|acme\.com)$")
 
@@ -47,8 +44,6 @@ def banned_hits(text: str, substrings=BANNED_SUBSTRINGS, words=BANNED_WORDS) -> 
 def files():
     for p in ROOT.rglob("*"):
         rel = p.relative_to(ROOT).parts
-        if rel[:3] == VENDORED:
-            continue
         if p.is_file() and not (set(rel) & SKIP_DIRS) and p.resolve() != SELF:
             yield p
 

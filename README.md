@@ -3,7 +3,6 @@
 [![CI](https://github.com/aidankaras/model-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/aidankaras/model-lab/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
-[![attested by humans](https://github.com/aidankaras/model-lab/actions/workflows/git-signoff.yml/badge.svg)](https://github.com/aidankaras/model-lab/actions/workflows/git-signoff.yml)
 
 Small, cheap, honest evaluations of which model is worth its price for a given job, run on real workloads instead of leaderboards.
 

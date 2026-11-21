@@ -16,7 +16,6 @@ packages = ["modellab", "email_triage"]
 line-length = 120
 target-version = "py311"
 # vendored third-party tooling is not linted as project code
-extend-exclude = [".claude", ".git-signoff"]
 force-exclude = true
 
 [tool.ruff.lint]
