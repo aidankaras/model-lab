@@ -52,7 +52,7 @@ What this says:
 |---|---|---|
 | Reasoning effort ladder (72 runs, 3 models) | No effort level buys a clear quality win. Cost per passed task: kimi-k2.6 $0.0129, deepseek-v4.1-flash $0.0015, glm-5.3-flash $0.0009 (0 fabrications). | [`e08b-effort-ladder.json`](results/e08b-effort-ladder.json) |
 | Grader robustness (5 graders, same answers) | Grader spread was 6-9 of 12 points on most cells; a model's apparent lead depended on which grader was used. glm had the lowest spread (2-4). | [`grader-robustness.json`](results/grader-robustness.json) |
-| Router test (12 goals, 3 models) | gpt-6-luna 12/12, glm-5.3-flash 12/12, deepseek-v4-flash 11/12. One rater, one batch each. | [`e06-full.json`](results/e06-full.json) |
+| Router test (12 goals, 3 models) | gpt-6-luna 12/12, glm-5.3-flash 12/12, deepseek-v4-flash 11/12. One rater, one batch each. | [`e06a-goal-routing.json`](results/e06a-goal-routing.json) |
 | Session-mined benchmark (10 tasks, no tools) | glm 10/10, deepseek 10/10, kimi 7/10 (three fabricated-adjacent answers). Tests honesty, not capability. | [`e01b-session-benchmark.json`](results/e01b-session-benchmark.json) |
 | Prompt caching, long sessions | Caching works on glm-5.3-flash but saves only 21-36% of input cost because input is already cheap; cached vs fresh input price ratio is 1.56x on glm vs 6.7x on deepseek. | [`e07-prompt-cache.json`](results/e07-prompt-cache.json) |
 | Bot-wall browsing test | Negative: neither tool got past a Cloudflare-protected page with defaults. | [`t02-bot-wall.json`](results/t02-bot-wall.json) |

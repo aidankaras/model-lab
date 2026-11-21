@@ -1,5 +1,7 @@
 {
-  "method": "E06-full: 20 hand-labeled routing scenarios (experiments/e06-scenarios.txt), grader prompts in experiments/e06-grader-*.md, 2 runs per model via hermes chat --format stream-json, strict N: route parsing, accuracy vs hand labels in results/e06-labels.json",
+  "experiment": "E06b: route decisions on 20 hand-labeled scenarios",
+  "question": "Does a cheaper model pick the right route for a request (none, default or advisor) as accurately as the baseline?",
+  "setup": "20 hand-labeled routing scenarios, 2 runs per model, strict parsing of the route from each answer, accuracy against the hand labels. Harder than E06a: the labels separate trivial requests (none) from ones that need the default model or the advisor.",
   "labels": {
     "1": "none",
     "2": "none",
@@ -106,5 +108,16 @@
       0.5
     ]
   },
-  "verdict": "Verdict: On 20 hand-labeled routing scenarios x 2 runs, gpt-6-luna scored 0.675 mean accuracy vs deepseek-v4-flash's 0.650 \u2014 a 1-item difference, well within run-to-run noise, and 10 of the 12 combined misses are the SAME five ambiguous 'trivial-but-constructive' items (cron-debug+patch, inbox summarize, tweet draft, typo fix, CSV convert) where both models reasonably say 'default' but the label says 'none', plus two advisor/default boundary cases. Neither model actually disagrees with the other in any meaningful way; the ceiling here is label quality, not model quality. However, luna is ALSO cheaper in practice: its harness input is prompt-cached (~3-6 billed input tokens per run), while deepseek's verbatim-first-run 14k input and 1.5-2x output verbosity put its real cost per pass (~$0.00085) ~7x luna's (~$0.00012). Conclusion: do NOT switch routing to deepseek-v4-flash on accuracy grounds \u2014 it shows no advantage and costs more in practice; luna's ~3-5x list-price gap is irrelevant at this volume (<$0.001/pass), so the current luna pin stands. Recommended follow-up: re-run with tightened 'none' definitions (explicitly list 'small fix/draft/admin' examples) before any future router-model decision, since label ambiguity dominates the error budget."
+  "prices_order": [
+    "input",
+    "output"
+  ],
+  "finding": "gpt-6-luna averaged 0.675 accuracy and deepseek-v4-flash 0.650, a one-item difference within run-to-run noise. Of the 27 misses across the 4 runs, 19 are on the same five items (1, 2, 6, 10, 12: cron debug and patch, inbox summary, tweet draft, typo fix, CSV conversion) where the label is 'none' and the models said 'default'; 7 are on two advisor/default boundary items (15, 20) and 1 is on item 18. The ceiling here is label quality, not model quality. luna was also cheaper in practice ($0.000124 vs $0.000852 per 20-scenario pass) because its input was prompt-cached.",
+  "limitations": [
+    "one labeler; the 'none' definition is ambiguous",
+    "2 runs per model",
+    "luna's billed input (3-6 tokens per run) reflects caching, not prompt size"
+  ],
+  "cost_usd_recorded": 0.001953,
+  "notes": "Models were called through an OpenAI-compatible router; names and prices are as recorded at run time."
 }
