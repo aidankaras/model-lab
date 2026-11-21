@@ -10,6 +10,7 @@ import sys
 LABELS = {
     "production-rules": "Regex rules",
     "zeroshot": "Zero-shot 1.5B",
+    "zeroshot-cal": "Zero-shot (cal.)",
     "tfidf": "TF-IDF + LogReg",
     "lora": "LoRA 0.5B",
 }

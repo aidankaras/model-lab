@@ -12,7 +12,7 @@ import os
 import sys
 import time
 
-from email_triage.triage_binary import email_text, load_train_labels, split_rows
+from email_triage.triage_binary import email_text, lib_versions, load_train_labels, split_rows
 
 
 def run(data: str, labels_path: str, out_dir: str, seed: int = 0) -> dict:
@@ -38,7 +38,7 @@ def run(data: str, labels_path: str, out_dir: str, seed: int = 0) -> dict:
         p = int(clf.predict(x)[0])
         out.append({"tid": r["tid"], "gold": r["y"], "pred": p, "ms": (time.time() - t) * 1000})
     meta = {"base": "tfidf-word1-2+char3-5 + logistic-regression", "train_n": len(train),
-            "train_seconds": round(train_s, 2)}
+            "train_seconds": round(train_s, 2), "versions": lib_versions("scikit-learn", "scipy")}
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, "preds-tfidf.json"), "w") as f:
         json.dump({"mode": "tfidf", **meta, "preds": out}, f)

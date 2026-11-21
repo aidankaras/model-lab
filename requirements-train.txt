@@ -1,6 +1,11 @@
 -r requirements.txt
-torch
-transformers
-peft
-datasets
-scikit-learn
+# Exact pins so the email study can be re-run against a known stack. These resolve together on
+# Python 3.11-3.13 (checked with `pip install --dry-run`). triage_binary.py and baseline.py also write
+# the installed versions into each preds-*.json, so a result file records what produced it.
+torch==2.15.0
+transformers==5.23.0
+peft==0.22.0
+accelerate==1.16.0
+datasets==5.2.0
+scikit-learn==1.9.1
+scipy==1.18.1

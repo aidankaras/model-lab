@@ -173,3 +173,26 @@ def test_chart_renders_svg():
     assert svg.startswith("<svg") and "LoRA 0.5B" in svg and "TF-IDF" in svg
     # the committed chart is exactly what render() produces from the committed results
     assert svg + "\n" == (ROOT / "docs/email-triage.svg").read_text()
+
+
+def test_best_threshold_maximizes_train_accuracy():
+    from email_triage.triage_binary import best_threshold
+
+    # every score is positive, so threshold 0 calls everything important; the best cut separates 2.0 from 5.0
+    scores, labels = [1.0, 2.0, 5.0, 6.0], [0, 0, 1, 1]
+    t = best_threshold(scores, labels)
+    assert 2.0 < t < 5.0
+    assert [int(s > t) for s in scores] == labels
+    assert best_threshold([-1.0, 1.0], [0, 1]) == 0.0  # ties prefer the uncalibrated threshold
+
+
+def test_label_logprob_sums_every_label_token():
+    torch = pytest.importorskip("torch")
+    from email_triage.triage_binary import label_logprob
+
+    class Uniform:  # every next token equally likely over a 4-token vocabulary
+        def __call__(self, input_ids):
+            return type("Out", (), {"logits": torch.zeros(1, input_ids.shape[1], 4)})()
+
+    lp = label_logprob(Uniform(), torch.tensor([0, 1]), [2, 3, 2])
+    assert lp == pytest.approx(3 * torch.log(torch.tensor(0.25)).item())
